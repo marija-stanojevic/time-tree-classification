@@ -13,12 +13,22 @@ def clean_ids(df, columns=True):
     return df
 
 
-def preproces_text(filename, col=2):
-    data = pd.read_csv(filename, header=None).drop_duplicates()
+def normalize_text_in_column(data, col):
+    data[col] = ["\"" + re.sub(r'[^\w\s.(),:;{}_><=\"\'\[\]\-/]+', '', str(x)).replace('  ', ' ').lower() + "\"" for x
+                 in data[col]]
+    return data
+
+
+def normalize_text(data):
+    data = ["\"" + re.sub(r'[^\w\s.(),:;{}_><=\"\'\[\]\-/]+', '', str(x)).replace('  ', ' ').lower() + "\"" for x
+            in data]
+    return data
+
+
+def preprocess_text(filename, col=2):
+    data = pd.read_csv(filename, header=None)
     data = data.iloc[:, col].values.tolist()
-    for i in range(len(data)):
-        if type(data[i]) == str:
-            data[i] = "\"" + re.sub(r'[^\s\w]+', ' ', data[i]).replace('  ', ' ').lower() + "\""
+    data = normalize_text(data)
     return data
 
 

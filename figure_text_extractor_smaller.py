@@ -13,8 +13,8 @@ def extract_figures_text():
         for index, row in texts.iterrows():
             figures = []
             figures_no = re.findall(
-                r"((\n.*){0,10}(([Ff][Ii][Gg](|\.|[Uu][Rr][Ee]|[Ss]\.)|[Ff] [Ii] [Gg] [Uu] [Rr] [Ee])"
-                + r"(\s|\\n)*((\s|\\n)\w|\w?\d+[-\\.]*\d*\w?)(\(|\)|,|\\'|\\.|\s|\\n))(.*\n){0,10})", row[1],
+                r"((\n.*){0,2}(([Ff][Ii][Gg](|\.|[Uu][Rr][Ee]|[Ss]\.)|[Ff] [Ii] [Gg] [Uu] [Rr] [Ee])"
+                + r"(\s|\\n)*((\s|\\n)\w|\w?\d+[-\\.]*\d*\w?)(\(|\)|,|\\'|\\.|\s|\\n))(.*\n){0,2})", row[1],
                 re.MULTILINE)
             for figure in figures_no:
                 fig_id = re.findall(r"(([Ff][Ii][Gg](|\.|[Uu][Rr][Ee]|[Ss]\.)|[Ff] [Ii] [Gg] [Uu] [Rr] [Ee])(\s|\\n)*" +
@@ -28,8 +28,8 @@ def extract_figures_text():
                         id = id[:-1]
                     if id != '':
                         k = len(figure[0])
-                        if k > 800:
-                            k = k - 800
+                        if k > 400:
+                            k = k - 400
                             fig = figure[0][k // 2:-k // 2]
                         else:
                             fig = figure[0]
@@ -40,7 +40,7 @@ def extract_figures_text():
             else:
                 figures = pd.DataFrame(figures)[[0, 2, 1]]
                 figures = figures.drop_duplicates()
-                figures.to_csv(file.replace('fulltext_corpus/text', 'figure_corpus/figures'), mode='a', index=False,
+                figures.to_csv(file.replace('fulltext_corpus/text', 'small_figure_corpus/figures'), mode='a', index=False,
                                header=False)
 
 
@@ -60,11 +60,11 @@ def training_test_figures_texts(labeled_file, crawler_file, igem_file):
     data = normalize_text_in_column(data, 1)
     df_test = data[0:int(0.2 * data.shape[0])]
     df_training = data[int(0.2 * data.shape[0]):]
-    df_test.to_csv('fig_test.csv', index=False, header=False)
-    df_training.to_csv('fig_train.csv', index=False, header=False)
+    df_test.to_csv('small_fig_test.csv', index=False, header=False)
+    df_training.to_csv('small_fig_train.csv', index=False, header=False)
 
 
 os.chdir('data')
 # extract_figures_text()
-# training_test_figures_texts('figure_labeled_examples.csv', 'figure_corpus/figurescrawledData.csv',
-#                             'figure_corpus/figuresiGEMsPDFs.csv')
+# training_test_figures_texts('figure_labeled_examples.csv', 'small_figure_corpus/figurescrawledData.csv',
+#                             'small_figure_corpus/figuresiGEMsPDFs.csv')

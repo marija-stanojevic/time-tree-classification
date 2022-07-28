@@ -13,6 +13,7 @@ import numpy as np
 import matplotlib.cm as cm
 import os
 from matplotlib import rcParams as rc
+
 # import nltk
 # nltk.download('punkt')
 
@@ -24,6 +25,7 @@ swords.update(['fig', 'figure', 'et', 'al', 'two', 'within', 'figs', 'three', 't
                'mr', 'org', 'biorxiv', 'preprint', 'peer', 'doi', 'review', 'copyright', 'version', 'http', 'https',
                'author', 'license', 'international', 'certified', 'granted', 'reserved', 'posted', 'funder', 'holder',
                'available', 'perpetuity'])
+keys = ['beast', 'mega', 'mrbayes', 'r8s']
 
 
 def generate_cloud(text, fig_file):
@@ -149,7 +151,7 @@ def tsne(model_file, fig_file, title):
             plt.annotate(label, xy=(x, y), xytext=(-60, 5), weight='bold', textcoords='offset points')
         plt.xlim(x_coords.min() + 0.00005, x_coords.max() - 0.00005)
         plt.ylim(y_coords.min() + 0.00005, y_coords.max() - 0.00005)
-        # plt.title(title)
+        plt.title(title)
         plt.savefig(f'tsne_{word}{fig_file}.png', dpi=300)
         plt.clf()
 
@@ -172,51 +174,53 @@ def tsne_clusters(model_file, title, fig, keys):
     embedding_clusters = np.array(embedding_clusters)
     n, m, k = embedding_clusters.shape
     tsne_model_en_2d = TSNE(perplexity=15, n_components=2, init='pca', n_iter=3500, random_state=32)
-    embeddings_en_2d = np.array(tsne_model_en_2d.fit_transform(embedding_clusters.reshape(n * m, k))).reshape(n, m, 2)
+    embeddings_en_2d = np.array(tsne_model_en_2d.fit_transform(embedding_clusters.reshape(n * m, k))).reshape(n, m)
     for i in range(len(keys)):
         x = embeddings_en_2d[i, :, 0]
         y = embeddings_en_2d[i, :, 1]
         plt.scatter(x, y, c=colors[i], alpha=0.75, label=keys[i])
-        for i, word in enumerate(words):
+        for i, word in enumerate(word_clusters):
             plt.annotate(word, alpha=0.5, xy=(x[i], y[i]), xytext=(5, 2),
                          textcoords='offset points', ha='right', va='bottom', size=8)
     plt.legend(loc=4)
     plt.title(title)
     plt.grid(True)
-    keys = '_'.join(keys)
-    plt.savefig(f'tsne_{fig}{keys}.png', dpi=300)
+    keys_name = '_'.join(keys)
+    plt.savefig(f'tsne_{fig}{keys_name}.png', dpi=300)
 
 
 os.chdir('data')
-# cloud_viz('fulltext_corpus/textcrawledData.csv', 'cloud_crawled.png')
-# cloud_viz('figure_corpus/figurescrawledData.csv', 'cloud_fig_crawled.png')
-# cloud_viz('fulltext_corpus/textcrawledDataRound2.csv', 'cloud_crawledRound2.png')
-# cloud_viz('figure_corpus/figurescrawledDataRound2.csv', 'cloud_fig_crawledRound2.png')
-# cloud_viz('fulltext_corpus/textiGEMsPDFs.csv', 'cloud_igem.png')
-# cloud_viz('figure_corpus/figuresiGEMsPDFs.csv', 'cloud_fig_igem.png')
-# cloud_viz('fulltext_corpus/textPMC.csv', 'cloud_PMC.png')
-# cloud_viz('figure_corpus/figuresPMC.csv', 'cloud_fig_PMC.png')
-# cloud_viz('fulltext_corpus/textPMCHistorical.csv', 'cloud_PMCHistorical.png')
-# cloud_viz('figure_corpus/figuresPMCHistorical.csv', 'cloud_fig_PMCHistorical.png')
-# cloud_viz('fulltext_corpus/textBiorxivTDM.csv', 'cloud_biorxivTDM.png')
-# cloud_viz('figure_corpus/figuresBiorxivTDM.csv', 'cloud_fig_biorxivTDM.png')
+cloud_viz('fulltext_corpus/textcrawledData.csv', 'cloud_crawled.png')
+cloud_viz('figure_corpus/figurescrawledData.csv', 'cloud_fig_crawled.png')
+cloud_viz('fulltext_corpus/textcrawledDataRound2.csv', 'cloud_crawledRound2.png')
+cloud_viz('figure_corpus/figurescrawledDataRound2.csv', 'cloud_fig_crawledRound2.png')
+cloud_viz('fulltext_corpus/textiGEMsPDFs.csv', 'cloud_igem.png')
+cloud_viz('figure_corpus/figuresiGEMsPDFs.csv', 'cloud_fig_igem.png')
+cloud_viz('fulltext_corpus/textPMC.csv', 'cloud_PMC.png')
+cloud_viz('figure_corpus/figuresPMC.csv', 'cloud_fig_PMC.png')
+cloud_viz('fulltext_corpus/textPMCHistorical.csv', 'cloud_PMCHistorical.png')
+cloud_viz('figure_corpus/figuresPMCHistorical.csv', 'cloud_fig_PMCHistorical.png')
+cloud_viz('fulltext_corpus/textBiorxivTDM.csv', 'cloud_biorxivTDM.png')
+cloud_viz('figure_corpus/figuresBiorxivTDM.csv', 'cloud_fig_biorxivTDM.png')
 
-# cloud_viz_pos_neg(['train.csv', 'test.csv'], 'cloud_pos.png', True)
-# cloud_viz_pos_neg(['train.csv', 'test.csv'], 'cloud_neg.png', False)
-# cloud_viz_pos_neg(['fig_train.csv', 'fig_test.csv'], 'cloud_fig_pos.png', True)
-# cloud_viz_pos_neg(['fig_train.csv', 'fig_test.csv'], 'cloud_fig_neg.png', False)
-# scatertext_viz_pos_neg(['test.csv'], 'scatter.html', st.Scalers.dense_rank, 200)
-# scatertext_viz_pos_neg(['test.csv'], 'scatter_stand.html', st.Scalers.log_scale_standardize, 200)
-# scatertext_viz_pos_neg(['test.csv'], 'scatter_perc.html', st.Scalers.percentile, 200)
-# scatertext_viz_pos_neg(['fig_train.csv', 'fig_test.csv'], 'scatter_fig.html', st.Scalers.dense_rank, 20)
-# scatertext_viz_pos_neg(['fig_train.csv', 'fig_test.csv'], 'scatter_stand_fig.html', st.Scalers.log_scale_standardize, 20)
-# scatertext_viz_pos_neg(['fig_train.csv', 'fig_test.csv'], 'scatter_perc_fig.html', st.Scalers.percentile, 20)
-# years_pie(['train.csv', 'test.csv'], 'pie_pos.png', True, 14, 26, 'Distribution of labeled papers with time-tree\n')
-# years_pie(['train.csv', 'test.csv'], 'pie_neg.png', False, 32, 44, 'Distribution of labeled papers without time-tree\n')
-# years_pie(['fig_train.csv', 'fig_test.csv'], 'pie_fig_pos.png', True, 11, 23, 'Distribution of labeled figures with time-tree\n')
-# years_pie(['fig_train.csv', 'fig_test.csv'], 'pie_fig_neg.png', False, 19, 31, 'Distribution of labeled figures without time-tree\n', 7)
+cloud_viz_pos_neg(['train.csv', 'test.csv'], 'cloud_pos.png', True)
+cloud_viz_pos_neg(['train.csv', 'test.csv'], 'cloud_neg.png', False)
+cloud_viz_pos_neg(['fig_train.csv', 'fig_test.csv'], 'cloud_fig_pos.png', True)
+cloud_viz_pos_neg(['fig_train.csv', 'fig_test.csv'], 'cloud_fig_neg.png', False)
+scatertext_viz_pos_neg(['test.csv'], 'scatter.html', st.Scalers.dense_rank, 200)
+scatertext_viz_pos_neg(['test.csv'], 'scatter_stand.html', st.Scalers.log_scale_standardize, 200)
+scatertext_viz_pos_neg(['test.csv'], 'scatter_perc.html', st.Scalers.percentile, 200)
+scatertext_viz_pos_neg(['fig_train.csv', 'fig_test.csv'], 'scatter_fig.html', st.Scalers.dense_rank, 20)
+scatertext_viz_pos_neg(['fig_train.csv', 'fig_test.csv'], 'scatter_stand_fig.html', st.Scalers.log_scale_standardize,
+                       20)
+scatertext_viz_pos_neg(['fig_train.csv', 'fig_test.csv'], 'scatter_perc_fig.html', st.Scalers.percentile, 20)
+years_pie(['train.csv', 'test.csv'], 'pie_pos.png', True, 14, 26, 'Distribution of labeled papers with time-tree\n')
+years_pie(['train.csv', 'test.csv'], 'pie_neg.png', False, 32, 44, 'Distribution of labeled papers without time-tree\n')
+years_pie(['fig_train.csv', 'fig_test.csv'], 'pie_fig_pos.png', True, 11, 23,
+          'Distribution of labeled figures with time-tree\n')
+years_pie(['fig_train.csv', 'fig_test.csv'], 'pie_fig_neg.png', False, 19, 31,
+          'Distribution of labeled figures without time-tree\n', 7)
 tsne('doc2vec.pc', '', 'Similar words from whole papers(doc2vec)')
 tsne('fig_doc2vec.pc', '_fig', 'Similar words from figures descriptions (doc2vec)')
-# keys = ['beast', 'mega', 'mrbayes', 'r8s']
-# tsne_clusters('doc2vec.pc', 'Doc2vec word clusters (papers)', '', keys)
-# tsne_clusters('fig_doc2vec.pc', 'Doc2vec word clusters (figure descriptions)', 'fig_', keys)
+tsne_clusters('doc2vec.pc', 'Doc2vec word clusters (papers)', '', keys)
+tsne_clusters('fig_doc2vec.pc', 'Doc2vec word clusters (figure descriptions)', 'fig_', keys)
